@@ -1,0 +1,162 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import React from "react";
+import BASE_URL from "../config";
+import { Link } from "react-router-dom";
+
+const ViewCompanyEmployees = () => {
+  const [allEmployee, setAllEmployee] = useState([]);
+  const company_jwtToken = sessionStorage.getItem("company-jwtToken");
+  const company = JSON.parse(sessionStorage.getItem("active-company"));
+
+  useEffect(() => {
+    const getAllUsers = async () => {
+      const allUsers = await retrieveAllUser();
+      if (allUsers) {
+        setAllEmployee(allUsers.users);
+      }
+    };
+
+    getAllUsers();
+  }, []);
+
+  const retrieveAllUser = async () => {
+    const response = await axios.get(
+      `${BASE_URL}/api/user/fetch/employee/company-wise?role=Employee&companyId=${company.company.id}`,
+      {
+        headers: {
+          //   Authorization: "Bearer " + company_jwtToken, // Replace with your actual JWT token
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  };
+
+  const formatDateFromEpoch = (epochTime) => {
+    const date = new Date(Number(epochTime));
+    const formattedDate = date.toLocaleString(); // Adjust the format as needed
+
+    return formattedDate;
+  };
+
+  return (
+    <div className="mt-3">
+      <div
+        className="card form-card ms-2 me-2 mb-5 shadow-lg"
+        style={{
+          height: "45rem",
+        }}
+      >
+        <div
+          className="card-header custom-bg-text text-center bg-color"
+          style={{
+            borderRadius: "1em",
+            height: "50px",
+          }}
+        >
+          <h2> Company Employees</h2>
+        </div>
+        <div
+          className="card-body"
+          style={{
+            overflowY: "auto",
+          }}
+        >
+          <div className="table-responsive">
+            <table className="table table-hover text-color text-center">
+              <thead className="table-bordered border-color bg-color custom-bg-text">
+                <tr>
+                  <th scope="col">First Name</th>
+                  <th scope="col">Last Name</th>
+                  <th scope="col">Email Id</th>
+                  <th scope="col">Phone No</th>
+                  <th scope="col">Department</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allEmployee.map((employeeUser) => {
+                  return (
+                    <tr>
+                      <td>
+                        <b>{employeeUser.firstName}</b>
+                      </td>
+                      <td>
+                        <b>{employeeUser.lastName}</b>
+                      </td>
+                      <td>
+                        <b>{employeeUser.emailId}</b>
+                      </td>
+                      <td>
+                        <b>{employeeUser.phoneNo}</b>
+                      </td>
+                      <td>
+                        {(() => {
+                          if (
+                            employeeUser.employee !== null &&
+                            Object.keys(employeeUser.employee).length > 0
+                          ) {
+                            return (
+                              <b>
+                                {employeeUser.employee.department.name +
+                                  " [" +
+                                  employeeUser.employee.designation.name +
+                                  "]"}{" "}
+                              </b>
+                            );
+                          } else {
+                            return <b>-</b>;
+                          }
+                        })()}
+                      </td>
+                      <td>
+                        <b>{employeeUser.status}</b>
+                      </td>
+                      <td>
+                        {(() => {
+                          if (
+                            employeeUser.employee !== null &&
+                            Object.keys(employeeUser.employee).length > 0
+                          ) {
+                            return (
+                              <>
+                                <Link
+                                  to={`/employee/view?employeeUserId=${employeeUser.id}`}
+                                  className="btn btn-sm bg-color custom-bg-text"
+                                >
+                                  Detail
+                                </Link>
+                                <Link
+                                  to={`/employee/${employeeUser.id}/attendance/manager/view`}
+                                  className="btn btn-sm bg-color custom-bg-text ms-2"
+                                >
+                                  Attendance
+                                </Link>
+                                {employeeUser?.employee && (
+                                  <Link
+                                    to={`/employee/${employeeUser.employee.id}/payslip/view`}
+                                    className="btn btn-sm bg-color custom-bg-text ms-2"
+                                  >
+                                    Payslip
+                                  </Link>
+                                )}
+                              </>
+                            );
+                          }
+                        })()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ViewCompanyEmployees;
