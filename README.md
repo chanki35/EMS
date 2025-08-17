@@ -8,8 +8,8 @@ solves all the HR and Employee related operations.
 //git commands for deployment
     open working folder in terminal
     git init  - initialized folder with git
-    git remote add origin https://github.com/himanshumishra07/EMS-Project.git  -add the remote github repogitory
-or  git remote set-url origin https://github.com/himanshumishra07/EMS-Project.git   -if remote origin already exists
+    git remote add origin https://github.com/chanki35/EMS.git  -add the remote github repogitory
+or  git remote set-url origin https://github.com/chanki35/EMS.git   -if remote origin already exists
     git add .   -add all the files in this folder
     git commit -m "Initial EMS project uploaded"    -commit the changes
     git push -u origin main    
